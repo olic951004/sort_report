@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>選擇排序示範</title>
+	<style>
+		body{font-family:system-ui,Segoe UI,Helvetica,Arial;margin:24px}
+		input,button{font-size:14px;padding:6px;margin:4px}
+		#bars{display:flex;align-items:end;height:200px;border:1px solid #eee;padding:8px;gap:4px;margin-top:12px}
+		.bar{background:#3b82f6;width:24px;text-align:center;color:#fff;border-radius:3px}
+		.bar.active{background:#ef4444}
+		.bar.swap{background:#f59e0b}
+		#info{margin-top:12px}
+	</style>
+</head>
+<body>
+	<h1>選擇排序（Selection Sort）</h1>
+	<div>
+		<input id="input" placeholder="輸入數字，用逗號或空白分隔，例如: 5,3,8,1" size="40">
+		<label for="count">元素數量:</label>
+		<input id="count" type="number" min="2" max="100" value="10" style="width:70px">
+		<button id="randBtn">隨機產生</button>
+		<button id="sortBtn">開始排序（動畫）</button>
+		<button id="instantBtn">立即排序（無動畫）</button>
+	</div>
+
+	<div id="before">原始陣列: </div>
+	<div id="after">排序結果: </div>
+	<div id="info"></div>
+	<div id="bars"></div>
+
+	<script>
+		function parseInput(text){
+			if(!text) return [];
+			return text.split(/[,\s]+/).map(s=>Number(s)).filter(n=>!Number.isNaN(n));
+		}
+
+		function renderBars(arr, activeIndexes=[]){
+			const container = document.getElementById('bars');
+			container.innerHTML = '';
+			arr.forEach((v,i)=>{
+				const bar = document.createElement('div');
+				bar.className = 'bar';
+				if(activeIndexes.includes(i)) bar.classList.add('active');
+				bar.style.height = Math.max(4, v) + 'px';
+				bar.title = String(v);
+				bar.textContent = v;
+				container.appendChild(bar);
+			});
+		}
+
+		function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+		async function selectionSortAnimated(arr, onUpdate, delay=200){
+			const n = arr.length;
+			for(let i=0;i<n-1;i++){
+				let minIndex = i;
+				onUpdate(arr, [i, minIndex]);
+				await sleep(delay);
+				for(let j=i+1;j<n;j++){
+					onUpdate(arr, [i, j, minIndex]);
+					await sleep(delay);
+					if(arr[j] < arr[minIndex]){
+						minIndex = j;
+						onUpdate(arr, [i, j, minIndex]);
+						await sleep(delay);
+					}
+				}
+				if(minIndex !== i){
+					const t = arr[i]; arr[i] = arr[minIndex]; arr[minIndex] = t;
+					onUpdate(arr, [i, minIndex]);
+					await sleep(delay);
+				}
+			}
+			onUpdate(arr, []);
+			return arr;
+		}
+
+		function selectionSortInstant(arr){
+			const n = arr.length;
+			for(let i=0;i<n-1;i++){
+				let minIndex = i;
+				for(let j=i+1;j<n;j++){
+					if(arr[j] < arr[minIndex]) minIndex = j;
+				}
+				if(minIndex !== i){
+					const t = arr[i]; arr[i] = arr[minIndex]; arr[minIndex] = t;
+				}
+			}
+			return arr;
+		}
+
+		function getCount(){
+			const raw = Number(document.getElementById('count').value);
+			if(!Number.isInteger(raw)) return 10;
+			return Math.min(100, Math.max(2, raw));
+		}
+
+		document.getElementById('randBtn').addEventListener('click', ()=>{
+			const count = getCount();
+			document.getElementById('count').value = count;
+			const arr = Array.from({length:count}, ()=>Math.floor(Math.random()*180)+10);
+			document.getElementById('input').value = arr.join(',');
+			document.getElementById('before').textContent = '原始陣列: ' + arr.join(', ');
+			document.getElementById('after').textContent = '排序結果: ';
+			document.getElementById('info').textContent = '已產生 ' + count + ' 個元素。';
+			renderBars(arr);
+		});
+
+		document.getElementById('sortBtn').addEventListener('click', async ()=>{
+			const arr = parseInput(document.getElementById('input').value);
+			if(arr.length===0) return alert('請先輸入數字或按「隨機產生」。');
+			document.getElementById('before').textContent = '原始陣列: ' + arr.join(', ');
+			document.getElementById('info').textContent = '排序中...';
+			document.getElementById('sortBtn').disabled = true;
+			document.getElementById('instantBtn').disabled = true;
+			document.getElementById('randBtn').disabled = true;
+			document.getElementById('count').disabled = true;
+			const sorted = arr.slice();
+			await selectionSortAnimated(sorted, (a, active)=>{
+				renderBars(a, active);
+			}, 120);
+			document.getElementById('after').textContent = '排序結果: ' + sorted.join(', ');
+			document.getElementById('info').textContent = '完成。';
+			document.getElementById('sortBtn').disabled = false;
+			document.getElementById('instantBtn').disabled = false;
+			document.getElementById('randBtn').disabled = false;
+			document.getElementById('count').disabled = false;
+		});
+
+		document.getElementById('instantBtn').addEventListener('click', ()=>{
+			const arr = parseInput(document.getElementById('input').value);
+			if(arr.length===0) return alert('請先輸入數字或按「隨機產生」。');
+			document.getElementById('before').textContent = '原始陣列: ' + arr.join(', ');
+			const sorted = selectionSortInstant(arr.slice());
+			renderBars(sorted);
+			document.getElementById('after').textContent = '排序結果: ' + sorted.join(', ');
+			document.getElementById('info').textContent = '已立即排序（無動畫）。';
+		});
+
+		// 初始化一組範例資料
+		(function(){
+			const example = [60,120,30,90,20,150,75,45,100,10];
+			document.getElementById('input').value = example.join(',');
+			document.getElementById('before').textContent = '原始陣列: ' + example.join(', ');
+			renderBars(example);
+		})();
+	</script>
+</body>
+</html>
+
