@@ -34,7 +34,6 @@ body{
   box-shadow:0 20px 40px rgba(0,0,0,.08);
 }
 
-h1{margin-bottom:6px}
 .subtitle{color:#475569;margin-bottom:16px}
 
 /* 說明區 */
@@ -82,9 +81,7 @@ h1{margin-bottom:6px}
   border-radius:14px;
   padding:16px;
   background:#f8fafc;
-  margin-bottom:16px;
 }
-
 .bars{
   display:flex;
   align-items:flex-end;
@@ -98,7 +95,6 @@ h1{margin-bottom:6px}
   flex-direction:column;
   align-items:center;
 }
-
 .bar{
   width:100%;
   background:var(--primary);
@@ -108,20 +104,14 @@ h1{margin-bottom:6px}
 .bar.compare{background:var(--accent)}
 .bar.swap{background:var(--danger)}
 .bar.sorted{background:var(--success)}
+.bar-label{margin-top:6px;font-size:12px}
 
-.bar-label{
-  margin-top:6px;
-  font-size:12px;
-  color:#475569;
-}
-
-/* 控制列 */
+/* 控制 */
 .controls{
   display:flex;
-  flex-wrap:wrap;
   gap:10px;
   justify-content:center;
-  margin-bottom:20px;
+  margin:20px 0;
 }
 button{
   padding:8px 16px;
@@ -129,30 +119,11 @@ button{
   border-radius:9999px;
   background:var(--primary);
   color:#fff;
-  font-size:14px;
   cursor:pointer;
 }
 button.secondary{background:#64748b}
 button.warn{background:var(--accent)}
-button:disabled{opacity:.5;cursor:not-allowed}
-
-/* 程式碼 */
-.code-box{
-  background:#0f172a;
-  color:#cbd5f5;
-  border-radius:14px;
-  padding:18px 22px;
-  font-family:Consolas,monospace;
-  font-size:13px;
-}
-.code-line{line-height:1.8}
-.code-line.highlight{
-  background:#1e293b;
-  border-radius:6px;
-}
-.kw{color:#93c5fd}
-.fn{color:#fbbf24}
-.num{color:#fdba74}
+button:disabled{opacity:.5}
 </style>
 </head>
 
@@ -164,10 +135,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <div class="principle">
 <strong>原理：</strong>
-氣泡排序會<strong>重複比較相鄰的兩個元素</strong>，  
-若順序錯誤就交換，讓較大的數字像氣泡一樣慢慢浮到右邊。
-<br><br>
-時間複雜度：平均 / 最差 <strong>O(n²)</strong>，最佳（已排序）為 <strong>O(n)</strong>
+重複比較相鄰兩數，順序錯誤即交換，讓最大值逐輪移動至右側。<br><br>
+時間複雜度：最佳 O(n)，平均 / 最差 O(n²)
 </div>
 
 <div class="info-bar">
@@ -176,9 +145,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <div class="info-pill">交換：<span id="infoSwp">0</span></div>
   <div class="info-pill">狀態：<span id="infoState">就緒</span></div>
 </div>
-<nav class="nav-links">
-  <a href="index.html">← 回首頁</a>
-</nav>
+
 <div class="step-msg" id="stepMsg">按「開始」觀看氣泡排序過程</div>
 
 <div class="chart-wrap">
@@ -186,70 +153,105 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </div>
 
 <div class="controls">
-  <button id="btnStart" onclick="startAuto()">▶ 開始</button>
-  <button id="btnPause" onclick="pauseAuto()" class="secondary" disabled>⏸ 暫停</button>
-  <button id="btnStep" onclick="doStep()" class="warn">單步</button>
+  <button onclick="startAuto()">▶ 開始</button>
+  <button onclick="pauseAuto()" class="secondary">⏸ 暫停</button>
+  <button onclick="doStep()" class="warn">單步</button>
   <button onclick="resetSort()" class="secondary">重置</button>
   <button onclick="randomArray()" class="secondary">亂數</button>
-</div>
-
-<div class="code-box">
-  <div class="code-line"><span class="kw">function</span> <span class="fn">bubbleSort</span>(arr) {</div>
-  <div class="code-line">&nbsp;&nbsp;<span class="kw">for</span> (let i = <span class="num">0</span>; i &lt; arr.length-1; i++) {</div>
-  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> (let j = <span class="num">0</span>; j &lt; arr.length-i-1; j++) {</div>
-  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (arr[j] &gt; arr[j+1]) {</div>
-  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[arr[j],arr[j+1]] = [arr[j+1],arr[j]];</div>
-  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</div>
-  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;}</div>
-  <div class="code-line">&nbsp;&nbsp;}</div>
-  <div class="code-line">}</div>
 </div>
 
 </div>
 
 <script>
-// ========= 資料 =========
-let arr = [64,34,25,12,22,11,90];
-const MAX_H = 220;
+let arr=[64,34,25,12,22,11,90];
+const MAX_H=220;
+let steps=[], cnt=0, timer=null;
 
-let steps = [];
-let stepIdx = 0;
-let autoTimer = null;
-let delay = 700;
-
-// ========= 預計算步驟 =========
 function computeSteps(a){
-  const s=[];
-  const data=[...a];
+  const s=[], data=[...a];
   let cmp=0, sw=0;
 
   for(let i=0;i<data.length-1;i++){
     for(let j=0;j<data.length-i-1;j++){
       cmp++;
-      s.push({arr:[...data], i, j, cmp, sw,
-        msg:`比較 ${data[j]} 與 ${data[j+1]}`,
-        phase:'compare'});
+      s.push({arr:[...data], i, j, cmp, sw, phase:"compare",
+              msg:`比較 ${data[j]} 與 ${data[j+1]}`});
       if(data[j]>data[j+1]){
         [data[j],data[j+1]]=[data[j+1],data[j]];
         sw++;
-        s.push({arr:[...data], i, j, cmp, sw,
-          msg:`交換 ${data[j+1]} 與 ${data[j]}`,
-          phase:'swap'});
+        s.push({arr:[...data], i, j, cmp, sw, phase:"swap",
+                msg:`交換 ${data[j]} 與 ${data[j+1]}`});
       }
     }
-    s.push({arr:[...data], sortedFrom:data.length-i-1,
-      msg:`第 ${i+1} 輪完成，最大值已固定`,
-      phase:'sorted'});
+    s.push({arr:[...data], i, cmp, sw, phase:"sorted",
+            sortedFrom:data.length-i-1,
+            msg:`第 ${i+1} 輪完成，最大值就位`});
   }
-
-  s.push({arr:[...data], msg:'🎉 排序完成', phase:'done', cmp, sw});
+  s.push({arr:[...data], cmp, sw, phase:"done", msg:"🎉 排序完成"});
   return s;
 }
 
-// ========= 渲染 =========
-function render(state){
-  const wrap=document.getElementById('bars');
-  wrap.innerHTML='';
-  const maxVal=Math.max(...state.arr);
+function render(st){
+  const bars=document.getElementById("bars");
+  bars.innerHTML="";
+  const max=Math.max(...st.arr);
 
-  state.arr.forEach((v,idx)=>{
+  st.arr.forEach((v,i)=>{
+    const col=document.createElement("div");
+    col.className="bar-col";
+
+    const bar=document.createElement("div");
+    bar.className="bar";
+    bar.style.height=`${v/max*MAX_H}px`;
+
+    if(st.phase==="compare"&&(i===st.j||i===st.j+1)) bar.classList.add("compare");
+    if(st.phase==="swap"&&(i===st.j||i===st.j+1)) bar.classList.add("swap");
+    if(st.phase==="sorted"&&i>=st.sortedFrom) bar.classList.add("sorted");
+    if(st.phase==="done") bar.classList.add("sorted");
+
+    const label=document.createElement("div");
+    label.className="bar-label";
+    label.textContent=v;
+
+    col.append(bar,label);
+    bars.appendChild(col);
+  });
+
+  infoPass.textContent=st.i!==undefined?st.i+1:"-";
+  infoCmp.textContent=st.cmp||0;
+  infoSwp.textContent=st.sw||0;
+  infoState.textContent=st.phase==="done"?"完成":"排序中";
+  stepMsg.textContent=st.msg||"";
+}
+
+function doStep(){
+  if(cnt>=steps.length) return;
+  render(steps[cnt++]);
+}
+
+function startAuto(){
+  if(timer) return;
+  timer=setInterval(()=>{ if(cnt>=steps.length) pauseAuto(); else doStep(); },700);
+}
+
+function pauseAuto(){
+  clearInterval(timer);
+  timer=null;
+}
+
+function resetSort(){
+  pauseAuto();
+  steps=computeSteps(arr);
+  cnt=0;
+  render({arr});
+}
+
+function randomArray(){
+  arr=Array.from({length:7},()=>Math.floor(Math.random()*90)+10);
+  resetSort();
+}
+
+resetSort();
+</script>
+</body>
+</html>
