@@ -169,6 +169,8 @@ function testSort(sortFunc, arr) {
   return end - start;
 }
 
+---
+
 ## 五、實驗結果比較與分析
 
 ### （一）排序時間結果比較
