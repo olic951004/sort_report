@@ -1,117 +1,84 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>選擇排序（Selection Sort）</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>選擇排序（Selection Sort）</title>
 
-<style>
-:root{
-  --primary:#2563eb;
-  --accent:#f59e0b;
-  --danger:#ef4444;
-  --success:#22c55e;
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --border:#e5e7eb;
-}
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  padding:24px;
-  font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
-  background:var(--bg);
-  color:#0f172a;
-}
-
-.nav-links{
-  margin-bottom:16px;
-}
-.nav-links a{
-  text-decoration:none;
-  background:#2563eb;
-  color:#fff;
-  padding:8px 16px;
-  border-radius:9999px;
-  font-size:14px;
-}
-
-.container{
-  max-width:900px;
-  margin:auto;
-  background:var(--card);
-  border-radius:16px;
-  padding:24px;
-  box-shadow:0 20px 40px rgba(0,0,0,.08);
-}
-
-.principle{
-  background:#f1f5f9;
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:16px 20px;
-  margin-bottom:16px;
-  font-size:14px;
-}
-
-#bars{
-  display:flex;
-  align-items:flex-end;
-  gap:8px;
-  height:240px;
-  background:#f8fafc;
-  border-radius:12px;
-  padding:16px;
-}
-
-.bar{
-  width:40px;
-  background:var(--primary);
-  border-radius:6px 6px 0 0;
-  color:#fff;
-  text-align:center;
-}
-</style>
+  <style>
+    body{
+      font-family:"Microsoft JhengHei",system-ui,sans-serif;
+      background:#f8fafc;
+      padding:24px;
+    }
+    .nav-links a{
+      display:inline-block;
+      margin-bottom:16px;
+      padding:8px 16px;
+      background:#2563eb;
+      color:#fff;
+      text-decoration:none;
+      border-radius:9999px;
+    }
+    .container{
+      background:#fff;
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 20px 40px rgba(0,0,0,.08);
+      max-width:900px;
+      margin:auto;
+    }
+    #bars{
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      height:240px;
+      margin-top:24px;
+    }
+    .bar{
+      width:40px;
+      background:#2563eb;
+      color:#fff;
+      text-align:center;
+      border-radius:6px 6px 0 0;
+    }
+  </style>
 </head>
 
 <body>
 
-<nav class="nav-links">
-  <a href="index.html">← 回首頁</a>
-</nav>
+  <nav class="nav-links">
+    <a href="index.html">← 回首頁</a>
+  </nav>
 
-<div class="container">
-  <h1>選擇排序（Selection Sort）</h1>
+  <div class="container">
+    <h1>選擇排序（Selection Sort）</h1>
+    <p>
+      選擇排序每一輪會從尚未排序的區域中找出最小值，
+      再與該區域的第一個元素交換位置。
+    </p>
 
-  <div class="principle">
-    選擇排序每一輪會從尚未排序的區域中找出最小值，
-    再與該區域的第一個元素交換位置。
+    <div id="bars"></div>
   </div>
 
-  <div id="bars"></div>
-</div>
+  <script>
+    const arr = [60, 30, 90, 20, 80, 40];
+    const bars = document.getElementById('bars');
+    const max = Math.max(...arr);
 
-<script>
-/* ===== 測試資料 ===== */
-const arr = [60, 30, 90, 20, 80, 40];
-const bars = document.getElementById('bars');
-const max = Math.max(...arr);
+    function render(){
+      bars.innerHTML = '';
+      arr.forEach(v=>{
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.height = (v / max * 200) + 'px';
+        bar.textContent = v;
+        bars.appendChild(bar);
+      });
+    }
 
-function render(){
-  bars.innerHTML = '';
-  arr.forEach(v=>{
-    const bar = document.createElement('div');
-    bar.className = 'bar';
-    bar.style.height = (v / max * 200) + 'px';
-    bar.textContent = v;
-    bars.appendChild(bar);
-  });
-}
-
-render();
-</script>
+    render();
+  </script>
 
 </body>
 </html>
-``
