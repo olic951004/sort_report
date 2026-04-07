@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合併排序（Merge Sort）</title>
+
+<style>
+:root{
+  --primary:#2563eb;
+  --accent:#f59e0b;
+  --success:#22c55e;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --border:#e5e7eb;
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:24px;
+  font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
+  background:var(--bg);
+  color:#0f172a;
+}
+
+/* 導覽 */
+.nav a{
+  display:inline-block;
+  margin-bottom:16px;
+  padding:8px 16px;
+  background:var(--primary);
+  color:#fff;
+  text-decoration:none;
+  border-radius:9999px;
+  font-size:14px;
+}
+
+/* 主卡片 */
+.container{
+  max-width:900px;
+  margin:auto;
+  background:var(--card);
+  padding:24px;
+  border-radius:16px;
+  box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+
+h1{margin-bottom:6px}
+.subtitle{color:#475569;margin-bottom:16px}
+
+/* 原理說明 */
+.principle{
+  background:#f1f5f9;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  font-size:14px;
+  margin-bottom:16px;
+}
+
+/* 控制 */
+.controls{
+  display:flex;
+  gap:10px;
+  margin-bottom:16px;
+}
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:9999px;
+  background:var(--primary);
+  color:#fff;
+  cursor:pointer;
+}
+button.secondary{background:#64748b}
+
+/* 圖表 */
+#bars{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  height:260px;
+  padding:16px;
+  background:#f8fafc;
+  border-radius:12px;
+}
+.bar{
+  width:36px;
+  background:var(--primary);
+  color:#fff;
+  text-align:center;
+  border-radius:6px 6px 0 0;
+  transition:0.3s;
+}
+.bar.active{background:var(--accent)}
+.bar.sorted{background:var(--success)}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+  index.html← 回首頁</a>
+</div>
+
+<div class="container">
+  <h1>合併排序（Merge Sort）</h1>
+  <p class="subtitle">Divide and Conquer</p>
+
+  <div class="principle">
+    合併排序使用<strong>分治法</strong>：
+    <br>1️⃣ 將陣列不斷分成左右兩半  
+    <br>2️⃣ 個別排序後再合併成有序陣列  
+    <br><br>
+    ✅ 時間複雜度：O(n log n)
+  </div>
+
+  <div class="controls">
+    <button onclick="start()">開始排序</button>
+    <button class="secondary" onclick="reset()">重置</button>
+  </div>
+
+  <div id="bars"></div>
+</div>
+
+<script>
+let original = [60,30,90,20,80,40];
+let arr = [];
+let steps = [];
+let stepIndex = 0;
+
+/* 建立排序步驟 */
+function mergeSortSteps(a,l,r){
+  if(r-l<=1) return;
+  const m = Math.floor((l+r)/2);
+  mergeSortSteps(a,l,m);
+  mergeSortSteps(a,m,r);
+  merge(a,l,m,r);
+}
+
+function merge(a,l,m,r){
+  const left=a.slice(l,m);
+  const right=a.slice(m,r);
+  let i=0,j=0,k=l;
+
+  while(i<left.length||j<right.length){
+    if(j>=right.length||(i<left.length&&left[i]<=right[j])){
+      a[k]=left[i++];
+    }else{
+      a[k]=right[j++];
+    }
+    steps.push({arr:[...a], idx:k});
+    k++;
+  }
+}
+
+/* 視覺 */
+function render(state){
+  bars.innerHTML='';
+  const max=Math.max(...state.arr);
+  state.arr.forEach((v,i)=>{
+    const bar=document.createElement('div');
+    bar.className='bar';
+    if(i===state.idx) bar.classList.add('active');
+    bar.style.height=(v/max*220)+'px';
+    bar.textContent=v;
+    bars.appendChild(bar);
+  });
+}
+
+function play(){
+  if(stepIndex>=steps.length){
+    document.querySelectorAll('.bar').forEach(b=>b.classList.add('sorted'));
+    return;
+  }
+  render(steps[stepIndex++]);
+  setTimeout(play,600);
+}
+
+function start(){
+  arr=[...original];
+  steps=[];
+  stepIndex=0;
+  mergeSortSteps(arr,0,arr.length);
+  play();
+}
+
+function reset(){
+  arr=[...original];
+  steps=[];
+  stepIndex=0;
+  render({arr});
+}
+
+/* 初始化 */
+reset();
+</script>
+
+</body>
+</html>
