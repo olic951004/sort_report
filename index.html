@@ -9,12 +9,11 @@
 :root{
   --primary:#2563eb;
   --accent:#f59e0b;
-  --success:#22c55e;
   --bg:#f8fafc;
   --card:#ffffff;
   --border:#e5e7eb;
+  --text:#0f172a;
 }
-
 *{box-sizing:border-box}
 
 body{
@@ -22,29 +21,29 @@ body{
   padding:32px 20px;
   font-family:"Microsoft JhengHei",system-ui,Segoe UI,Arial;
   background:var(--bg);
-  color:#0f172a;
+  color:var(--text);
 }
 
 .container{
-  max-width:1000px;
+  max-width:1100px;
   margin:auto;
 }
 
-/* 標題 */
+/* ===== 標題 ===== */
 h1{
   margin-bottom:6px;
 }
 .subtitle{
   color:#475569;
-  margin-bottom:28px;
+  margin-bottom:24px;
 }
 
-/* 導覽列（可選但很加分） */
+/* ===== 導覽列（互動按鍵） ===== */
 .navbar{
   display:flex;
   gap:12px;
-  margin-bottom:28px;
   flex-wrap:wrap;
+  margin-bottom:32px;
 }
 
 .navbar a{
@@ -54,14 +53,16 @@ h1{
   background:var(--primary);
   color:#fff;
   font-size:14px;
+  font-weight:500;
   transition:.2s;
 }
 
 .navbar a:hover{
   background:#1d4ed8;
+  transform:translateY(-1px);
 }
 
-/* 卡片區 */
+/* ===== 卡片區 ===== */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -115,7 +116,7 @@ h1{
   width:max-content;
 }
 
-/* 卡片按鈕 */
+/* 卡片內按鈕 */
 .card a{
   margin-top:18px;
   align-self:flex-start;
@@ -148,16 +149,16 @@ h1{
 <h1>排序演算法視覺化</h1>
 <p class="subtitle">Sorting Algorithm Visualization</p>
 
-<!-- 上方導覽列 -->
+<!-- ===== 上方互動導覽列（重點） ===== -->
 <nav class="navbar">
-  bubble.html氣泡排序</a>
-  insertion.html插入排序</a>
-  selection.html選擇排序</a>
-  merge.html合併排序</a>
-  quick.html快速排序</a>
+  <a href="bubble.html">氣泡排序</a>
+  <a href="insertion.html">插入排序</a>
+  <a href="selection.html">選擇排序</a>
+  <a href="merge.html">合併排序</a>
+  <a href="quick.html">快速排序</a>
 </nav>
 
-<!-- 主要卡片 -->
+<!-- ===== 排序卡片 ===== -->
 <div class="grid">
 
   <div class="card">
@@ -168,10 +169,10 @@ h1{
       <p>
         重複比較相鄰元素，
         若順序錯誤就交換，
-        最大值逐步移到右側。
+        最大值逐步移至右側。
       </p>
     </div>
-    bubble.html開始學習 →</a>
+    <a href="bubble.html">開始學習 →</a>
   </div>
 
   <div class="card">
@@ -185,7 +186,7 @@ h1{
         正確位置。
       </p>
     </div>
-    insertion.html開始學習 →</a>
+    <a href="insertion.html">開始學習 →</a>
   </div>
 
   <div class="card">
@@ -199,7 +200,7 @@ h1{
         元素交換。
       </p>
     </div>
-    selection.html開始學習 →</a>
+    <a href="selection.html">開始學習 →</a>
   </div>
 
   <div class="card">
@@ -208,12 +209,12 @@ h1{
       <h2>合併排序</h2>
       <div class="en">Merge Sort</div>
       <p>
-        不斷將資料拆分，
-        分別排序後再合併，
+        將資料不斷拆分，
+        排序後再合併，
         時間複雜度穩定。
       </p>
     </div>
-    merge.html開始學習 →</a>
+    <a href="merge.html">開始學習 →</a>
   </div>
 
   <div class="card">
@@ -222,12 +223,12 @@ h1{
       <h2>快速排序</h2>
       <div class="en">Quick Sort</div>
       <p>
-        選擇基準值，
-        將資料分成左右，
-        平均效率極佳。
+        選擇基準值切分左右，
+        平均效率極佳，
+        實務常用。
       </p>
     </div>
-    quick.html開始學習 →</a>
+    <a href="quick.html">開始學習 →</a>
   </div>
 
 </div>
