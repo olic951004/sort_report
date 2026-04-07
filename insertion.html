@@ -45,3 +45,259 @@ h1{margin-bottom:6px}
   padding:16px 20px;
   margin-bottom:20px;
   font-size:14px;
+  line-height:1.7;
+}
+.principle strong{color:var(--accent)}
+
+/* 狀態列 */
+.info-bar{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.info-pill{
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:9999px;
+  padding:6px 14px;
+  font-size:13px;
+}
+.info-pill span{font-weight:700}
+
+/* 步驟訊息 */
+.step-msg{
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  border-radius:10px;
+  padding:10px 18px;
+  margin-bottom:18px;
+  font-size:14px;
+  color:#1e3a8a;
+}
+
+/* 長條圖 */
+.chart-wrap{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  background:#f8fafc;
+  margin-bottom:16px;
+}
+.bars{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:8px;
+  height:260px;
+}
+.bar-col{
+  width:40px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.bar{
+  width:100%;
+  background:var(--primary);
+  border-radius:6px 6px 0 0;
+  transition:.25s;
+}
+.bar.compare{background:var(--accent)}
+.bar.move{background:var(--danger)}
+.bar.sorted{background:var(--success)}
+
+.bar-label{
+  margin-top:6px;
+  font-size:12px;
+  color:#475569;
+}
+
+/* 控制 */
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:20px;
+}
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:9999px;
+  background:var(--primary);
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+}
+button.secondary{background:#64748b}
+button.warn{background:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>插入排序（Insertion Sort）</h1>
+<p class="subtitle">Bubble 風格互動介面</p>
+
+<div class="principle">
+<strong>原理：</strong>
+插入排序會將每個新元素（key）  
+<strong>插入到左側已排序區域中的正確位置</strong>。
+</div>
+
+<div class="info-bar">
+  <div class="info-pill">第 <span id="infoPass">0</span> 輪</div>
+  <div class="info-pill">比較：<span id="infoCmp">0</span></div>
+  <div class="info-pill">移動：<span id="infoMov">0</span></div>
+  <div class="info-pill">狀態：<span id="infoState">就緒</span></div>
+</div>
+
+<div class="step-msg" id="stepMsg">按開始觀察插入排序流程</div>
+
+<div class="chart-wrap">
+  <div class="bars" id="bars"></div>
+</div>
+
+<div class="controls">
+  <button id="btnStart" onclick="startAuto()">▶ 開始</button>
+  <button id="btnPause" onclick="pauseAuto()" class="secondary" disabled>⏸ 暫停</button>
+  <button id="btnStep" onclick="doStep()" class="warn">單步</button>
+  <button onclick="resetSort()" class="secondary">重置</button>
+  <button onclick="randomArray()" class="secondary">亂數</button>
+</div>
+
+</div>
+
+<script>
+let arr = [64,34,25,12,22,11,90];
+const MAX_H = 220;
+
+let steps=[];
+let stepIdx=0;
+let autoTimer=null;
+let delay=700;
+
+function computeSteps(a){
+  const s=[];
+  const data=[...a];
+  let cmp=0, mov=0;
+
+  for(let i=1;i<data.length;i++){
+    let key=data[i];
+    let j=i-1;
+
+    s.push({arr:[...data], i, j, cmp, mov,
+      msg:`第 ${i} 輪：準備插入 ${key}`});
+
+    while(j>=0){
+      cmp++;
+      s.push({arr:[...data], i, j, cmp, mov,
+        comparing:j,
+        msg:`比較 ${data[j]} 與 ${key}`});
+
+      if(data[j]>key){
+        data[j+1]=data[j];
+        mov++;
+        s.push({arr:[...data], i, j, cmp, mov,
+          moving:j+1,
+          msg:`右移 ${data[j]}`});
+        j--;
+      }else{
+        break;
+      }
+    }
+
+    data[j+1]=key;
+    mov++;
+    s.push({arr:[...data], i, j, cmp, mov,
+      inserted:j+1,
+      msg:`插入 ${key} 到位置 ${j+1}`});
+  }
+
+  s.push({arr:[...data], cmp, mov, done:true,
+    msg:'🎉 排序完成'});
+  return s;
+}
+
+function render(state){
+  bars.innerHTML='';
+  const maxVal=Math.max(...state.arr);
+
+  state.arr.forEach((v,idx)=>{
+    const col=document.createElement('div');
+    col.className='bar-col';
+
+    const bar=document.createElement('div');
+    bar.className='bar';
+    bar.style.height=Math.max(20,(v/maxVal)*MAX_H)+'px';
+
+    if(idx<=state.i-1) bar.classList.add('sorted');
+    if(idx===state.comparing) bar.classList.add('compare');
+    if(idx===state.moving||idx===state.inserted) bar.classList.add('move');
+
+    const lbl=document.createElement('div');
+    lbl.className='bar-label';
+    lbl.textContent=v;
+
+    col.appendChild(bar);
+    col.appendChild(lbl);
+    bars.appendChild(col);
+  });
+
+  stepMsg.textContent=state.msg;
+  infoPass.textContent=state.i||0;
+  infoCmp.textContent=state.cmp||0;
+  infoMov.textContent=state.mov||0;
+  infoState.textContent=state.done?'完成 ✅':(autoTimer?'播放中':'暫停');
+}
+
+function doStep(){
+  if(stepIdx<steps.length-1){
+    stepIdx++;
+    render(steps[stepIdx]);
+  }
+}
+
+function startAuto(){
+  if(stepIdx>=steps.length-1) return;
+  btnStart.disabled=true;
+  btnPause.disabled=false;
+  btnStep.disabled=true;
+  autoTimer=setInterval(()=>{
+    if(stepIdx>=steps.length-1){pauseAuto();return}
+    doStep();
+  },delay);
+}
+
+function pauseAuto(){
+  clearInterval(autoTimer);
+  autoTimer=null;
+  btnStart.disabled=false;
+  btnPause.disabled=true;
+  btnStep.disabled=false;
+}
+
+function resetSort(){
+  pauseAuto();
+  steps=computeSteps(arr);
+  stepIdx=0;
+  render(steps[0]);
+}
+
+function randomArray(){
+  arr=Array.from({length:7},()=>Math.floor(Math.random()*90)+10);
+  resetSort();
+}
+
+/* 啟動 */
+steps=computeSteps(arr);
+render(steps[0]);
+</script>
+
+</body>
+</html>
+``
