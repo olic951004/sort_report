@@ -1,152 +1,253 @@
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>選擇排序示範</title>
-	<style>
-		body{font-family:system-ui,Segoe UI,Helvetica,Arial;margin:24px}
-		input,button{font-size:14px;padding:6px;margin:4px}
-		#bars{display:flex;align-items:end;height:200px;border:1px solid #eee;padding:8px;gap:4px;margin-top:12px}
-		.bar{background:#3b82f6;width:24px;text-align:center;color:#fff;border-radius:3px}
-		.bar.active{background:#ef4444}
-		.bar.swap{background:#f59e0b}
-		#info{margin-top:12px}
-	</style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>氣泡排序（Bubble Sort）</title>
+
+<style>
+:root{
+  --primary:#2563eb;
+  --accent:#f59e0b;
+  --danger:#ef4444;
+  --success:#22c55e;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --border:#e5e7eb;
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:24px;
+  font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
+  background:var(--bg);
+  color:#0f172a;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  background:var(--card);
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+
+h1{margin-bottom:6px}
+.subtitle{color:#475569;margin-bottom:16px}
+
+/* 說明區 */
+.principle{
+  background:#f1f5f9;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 20px;
+  margin-bottom:20px;
+  font-size:14px;
+  line-height:1.7;
+}
+.principle strong{color:var(--accent)}
+
+/* 資訊列 */
+.info-bar{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.info-pill{
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:9999px;
+  padding:6px 14px;
+  font-size:13px;
+}
+.info-pill span{font-weight:700}
+
+/* 步驟訊息 */
+.step-msg{
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  border-radius:10px;
+  padding:10px 18px;
+  margin-bottom:18px;
+  font-size:14px;
+  color:#1e3a8a;
+}
+
+/* 圖表 */
+.chart-wrap{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  background:#f8fafc;
+  margin-bottom:16px;
+}
+
+.bars{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:8px;
+  height:260px;
+}
+.bar-col{
+  width:40px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.bar{
+  width:100%;
+  background:var(--primary);
+  border-radius:6px 6px 0 0;
+  transition:.25s;
+}
+.bar.compare{background:var(--accent)}
+.bar.swap{background:var(--danger)}
+.bar.sorted{background:var(--success)}
+
+.bar-label{
+  margin-top:6px;
+  font-size:12px;
+  color:#475569;
+}
+
+/* 控制列 */
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:20px;
+}
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:9999px;
+  background:var(--primary);
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+}
+button.secondary{background:#64748b}
+button.warn{background:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+
+/* 程式碼 */
+.code-box{
+  background:#0f172a;
+  color:#cbd5f5;
+  border-radius:14px;
+  padding:18px 22px;
+  font-family:Consolas,monospace;
+  font-size:13px;
+}
+.code-line{line-height:1.8}
+.code-line.highlight{
+  background:#1e293b;
+  border-radius:6px;
+}
+.kw{color:#93c5fd}
+.fn{color:#fbbf24}
+.num{color:#fdba74}
+</style>
 </head>
+
 <body>
-	<h1>選擇排序（Selection Sort）</h1>
-	<div>
-		<input id="input" placeholder="輸入數字，用逗號或空白分隔，例如: 5,3,8,1" size="40">
-		<label for="count">元素數量:</label>
-		<input id="count" type="number" min="2" max="100" value="10" style="width:70px">
-		<button id="randBtn">隨機產生</button>
-		<button id="sortBtn">開始排序（動畫）</button>
-		<button id="instantBtn">立即排序（無動畫）</button>
-	</div>
+<div class="container">
 
-	<div id="before">原始陣列: </div>
-	<div id="after">排序結果: </div>
-	<div id="info"></div>
-	<div id="bars"></div>
+<h1>氣泡排序（Bubble Sort）</h1>
+<p class="subtitle">視覺化步驟演示</p>
 
-	<script>
-		function parseInput(text){
-			if(!text) return [];
-			return text.split(/[,\s]+/).map(s=>Number(s)).filter(n=>!Number.isNaN(n));
-		}
+<div class="principle">
+<strong>原理：</strong>
+氣泡排序會<strong>重複比較相鄰的兩個元素</strong>，  
+若順序錯誤就交換，讓較大的數字像氣泡一樣慢慢浮到右邊。
+<br><br>
+時間複雜度：平均 / 最差 <strong>O(n²)</strong>，最佳（已排序）為 <strong>O(n)</strong>
+</div>
 
-		function renderBars(arr, activeIndexes=[]){
-			const container = document.getElementById('bars');
-			container.innerHTML = '';
-			arr.forEach((v,i)=>{
-				const bar = document.createElement('div');
-				bar.className = 'bar';
-				if(activeIndexes.includes(i)) bar.classList.add('active');
-				bar.style.height = Math.max(4, v) + 'px';
-				bar.title = String(v);
-				bar.textContent = v;
-				container.appendChild(bar);
-			});
-		}
+<div class="info-bar">
+  <div class="info-pill">第 <span id="infoPass">0</span> 輪</div>
+  <div class="info-pill">比較：<span id="infoCmp">0</span></div>
+  <div class="info-pill">交換：<span id="infoSwp">0</span></div>
+  <div class="info-pill">狀態：<span id="infoState">就緒</span></div>
+</div>
 
-		function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+<div class="step-msg" id="stepMsg">按「開始」觀看氣泡排序過程</div>
 
-		async function selectionSortAnimated(arr, onUpdate, delay=200){
-			const n = arr.length;
-			for(let i=0;i<n-1;i++){
-				let minIndex = i;
-				onUpdate(arr, [i, minIndex]);
-				await sleep(delay);
-				for(let j=i+1;j<n;j++){
-					onUpdate(arr, [i, j, minIndex]);
-					await sleep(delay);
-					if(arr[j] < arr[minIndex]){
-						minIndex = j;
-						onUpdate(arr, [i, j, minIndex]);
-						await sleep(delay);
-					}
-				}
-				if(minIndex !== i){
-					const t = arr[i]; arr[i] = arr[minIndex]; arr[minIndex] = t;
-					onUpdate(arr, [i, minIndex]);
-					await sleep(delay);
-				}
-			}
-			onUpdate(arr, []);
-			return arr;
-		}
+<div class="chart-wrap">
+  <div class="bars" id="bars"></div>
+</div>
 
-		function selectionSortInstant(arr){
-			const n = arr.length;
-			for(let i=0;i<n-1;i++){
-				let minIndex = i;
-				for(let j=i+1;j<n;j++){
-					if(arr[j] < arr[minIndex]) minIndex = j;
-				}
-				if(minIndex !== i){
-					const t = arr[i]; arr[i] = arr[minIndex]; arr[minIndex] = t;
-				}
-			}
-			return arr;
-		}
+<div class="controls">
+  <button id="btnStart" onclick="startAuto()">▶ 開始</button>
+  <button id="btnPause" onclick="pauseAuto()" class="secondary" disabled>⏸ 暫停</button>
+  <button id="btnStep" onclick="doStep()" class="warn">單步</button>
+  <button onclick="resetSort()" class="secondary">重置</button>
+  <button onclick="randomArray()" class="secondary">亂數</button>
+</div>
 
-		function getCount(){
-			const raw = Number(document.getElementById('count').value);
-			if(!Number.isInteger(raw)) return 10;
-			return Math.min(100, Math.max(2, raw));
-		}
+<div class="code-box">
+  <div class="code-line"><span class="kw">function</span> <span class="fn">bubbleSort</span>(arr) {</div>
+  <div class="code-line">&nbsp;&nbsp;<span class="kw">for</span> (let i = <span class="num">0</span>; i &lt; arr.length-1; i++) {</div>
+  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> (let j = <span class="num">0</span>; j &lt; arr.length-i-1; j++) {</div>
+  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (arr[j] &gt; arr[j+1]) {</div>
+  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[arr[j],arr[j+1]] = [arr[j+1],arr[j]];</div>
+  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</div>
+  <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;}</div>
+  <div class="code-line">&nbsp;&nbsp;}</div>
+  <div class="code-line">}</div>
+</div>
 
-		document.getElementById('randBtn').addEventListener('click', ()=>{
-			const count = getCount();
-			document.getElementById('count').value = count;
-			const arr = Array.from({length:count}, ()=>Math.floor(Math.random()*180)+10);
-			document.getElementById('input').value = arr.join(',');
-			document.getElementById('before').textContent = '原始陣列: ' + arr.join(', ');
-			document.getElementById('after').textContent = '排序結果: ';
-			document.getElementById('info').textContent = '已產生 ' + count + ' 個元素。';
-			renderBars(arr);
-		});
+</div>
 
-		document.getElementById('sortBtn').addEventListener('click', async ()=>{
-			const arr = parseInput(document.getElementById('input').value);
-			if(arr.length===0) return alert('請先輸入數字或按「隨機產生」。');
-			document.getElementById('before').textContent = '原始陣列: ' + arr.join(', ');
-			document.getElementById('info').textContent = '排序中...';
-			document.getElementById('sortBtn').disabled = true;
-			document.getElementById('instantBtn').disabled = true;
-			document.getElementById('randBtn').disabled = true;
-			document.getElementById('count').disabled = true;
-			const sorted = arr.slice();
-			await selectionSortAnimated(sorted, (a, active)=>{
-				renderBars(a, active);
-			}, 120);
-			document.getElementById('after').textContent = '排序結果: ' + sorted.join(', ');
-			document.getElementById('info').textContent = '完成。';
-			document.getElementById('sortBtn').disabled = false;
-			document.getElementById('instantBtn').disabled = false;
-			document.getElementById('randBtn').disabled = false;
-			document.getElementById('count').disabled = false;
-		});
+<script>
+// ========= 資料 =========
+let arr = [64,34,25,12,22,11,90];
+const MAX_H = 220;
 
-		document.getElementById('instantBtn').addEventListener('click', ()=>{
-			const arr = parseInput(document.getElementById('input').value);
-			if(arr.length===0) return alert('請先輸入數字或按「隨機產生」。');
-			document.getElementById('before').textContent = '原始陣列: ' + arr.join(', ');
-			const sorted = selectionSortInstant(arr.slice());
-			renderBars(sorted);
-			document.getElementById('after').textContent = '排序結果: ' + sorted.join(', ');
-			document.getElementById('info').textContent = '已立即排序（無動畫）。';
-		});
+let steps = [];
+let stepIdx = 0;
+let autoTimer = null;
+let delay = 700;
 
-		// 初始化一組範例資料
-		(function(){
-			const example = [60,120,30,90,20,150,75,45,100,10];
-			document.getElementById('input').value = example.join(',');
-			document.getElementById('before').textContent = '原始陣列: ' + example.join(', ');
-			renderBars(example);
-		})();
-	</script>
-</body>
-</html>
+// ========= 預計算步驟 =========
+function computeSteps(a){
+  const s=[];
+  const data=[...a];
+  let cmp=0, sw=0;
 
+  for(let i=0;i<data.length-1;i++){
+    for(let j=0;j<data.length-i-1;j++){
+      cmp++;
+      s.push({arr:[...data], i, j, cmp, sw,
+        msg:`比較 ${data[j]} 與 ${data[j+1]}`,
+        phase:'compare'});
+      if(data[j]>data[j+1]){
+        [data[j],data[j+1]]=[data[j+1],data[j]];
+        sw++;
+        s.push({arr:[...data], i, j, cmp, sw,
+          msg:`交換 ${data[j+1]} 與 ${data[j]}`,
+          phase:'swap'});
+      }
+    }
+    s.push({arr:[...data], sortedFrom:data.length-i-1,
+      msg:`第 ${i+1} 輪完成，最大值已固定`,
+      phase:'sorted'});
+  }
+
+  s.push({arr:[...data], msg:'🎉 排序完成', phase:'done', cmp, sw});
+  return s;
+}
+
+// ========= 渲染 =========
+function render(state){
+  const wrap=document.getElementById('bars');
+  wrap.innerHTML='';
+  const maxVal=Math.max(...state.arr);
+
+  state.arr.forEach((v,idx)=>{
