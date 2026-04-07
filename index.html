@@ -9,7 +9,6 @@
 :root{
   --primary:#2563eb;
   --accent:#f59e0b;
-  --danger:#ef4444;
   --success:#22c55e;
   --bg:#f8fafc;
   --card:#ffffff;
@@ -19,8 +18,8 @@
 
 body{
   margin:0;
-  padding:24px;
-  font-family:system-ui,"Microsoft JhengHei",Segoe UI,Arial;
+  padding:32px 20px;
+  font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
   background:var(--bg);
   color:#0f172a;
 }
@@ -28,78 +27,84 @@ body{
 .container{
   max-width:1000px;
   margin:auto;
-  background:var(--card);
-  border-radius:16px;
-  padding:24px;
-  box-shadow:0 20px 40px rgba(0,0,0,.08);
 }
 
 h1{margin-bottom:6px}
-.subtitle{color:#475569;margin-bottom:20px}
+.subtitle{color:#475569;margin-bottom:28px}
 
-.selector{
-  display:flex;
-  gap:10px;
-  margin-bottom:20px;
+/* 卡片區 */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:24px;
 }
-.selector button{
-  padding:8px 18px;
-  border-radius:9999px;
+
+.card{
+  background:var(--card);
   border:1px solid var(--border);
-  background:#f1f5f9;
-  cursor:pointer;
-}
-.selector button.active{
-  background:var(--primary);
-  color:#fff;
-}
-
-.controls{
+  border-radius:16px;
+  padding:22px 22px 26px;
+  box-shadow:0 10px 25px rgba(0,0,0,.06);
   display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:16px;
-}
-.controls button{
-  padding:8px 16px;
-  border:none;
-  border-radius:9999px;
-  background:var(--primary);
-  color:#fff;
-}
-.controls button.secondary{background:#64748b}
-.controls button.warn{background:var(--accent)}
-
-.info{
-  margin-bottom:14px;
-  font-size:14px;
-  color:#475569;
-}
-
-.chart{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:16px;
-  background:#f8fafc;
-}
-.bars{
-  display:flex;
-  gap:8px;
-  height:260px;
-  align-items:flex-end;
-  justify-content:center;
-}
-.bar{
-  width:40px;
-  background:var(--primary);
-  border-radius:6px 6px 0 0;
+  flex-direction:column;
+  justify-content:space-between;
   transition:.25s;
 }
-.bar-label{
-  text-align:center;
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 18px 40px rgba(0,0,0,.12);
+}
+
+.card h2{
+  margin:6px 0;
+  font-size:1.2rem;
+}
+.card .en{
+  color:#64748b;
+  font-size:.9rem;
+  margin-bottom:10px;
+}
+.card p{
+  font-size:14px;
+  line-height:1.6;
+  color:#334155;
+}
+
+/* 標籤 */
+.badge{
+  display:inline-block;
+  background:#eff6ff;
+  color:var(--primary);
+  border:1px solid #bfdbfe;
+  border-radius:9999px;
+  padding:4px 12px;
   font-size:12px;
-  margin-top:6px;
-  color:#475569;
+  margin-bottom:10px;
+  width:max-content;
+}
+
+/* 連結按鈕 */
+.card a{
+  margin-top:18px;
+  align-self:flex-start;
+  text-decoration:none;
+  background:var(--primary);
+  color:#fff;
+  padding:8px 18px;
+  border-radius:9999px;
+  font-size:14px;
+  transition:.2s;
+}
+.card a:hover{
+  background:#1d4ed8;
+}
+
+/* Footer */
+.footer{
+  margin-top:40px;
+  text-align:center;
+  font-size:13px;
+  color:#64748b;
 }
 </style>
 </head>
@@ -110,75 +115,59 @@ h1{margin-bottom:6px}
 <h1>排序演算法視覺化</h1>
 <p class="subtitle">Sorting Algorithm Visualization</p>
 
-<!-- 演算法切換 -->
-<div class="selector">
-  <button id="btnBubble" class="active" onclick="setAlgo('bubble')">氣泡排序</button>
-  <button id="btnInsertion" onclick="setAlgo('insertion')">插入排序</button>
-  <button id="btnSelection" onclick="setAlgo('selection')">選擇排序</button>
+<div class="grid">
+
+  <!-- Bubble Sort -->
+  <div class="card">
+    <div>
+      <span class="badge">交換導向</span>
+      <h2>氣泡排序</h2>
+      <div class="en">Bubble Sort</div>
+      <p>
+        重複比較相鄰元素，  
+        若順序錯誤就交換，  
+        讓最大值逐步移至右側。
+      </p>
+    </div>
+    <a href="bubble.html">開始學習 →</a>
+  </div>
+
+  <!-- Insertion Sort -->
+  <div class="card">
+    <div>
+      <span class="badge">插入導向</span>
+      <h2>插入排序</h2>
+      <div class="en">Insertion Sort</div>
+      <p>
+        將每個元素插入到  
+        左側已排序區域的  
+        正確位置。
+      </p>
+    </div>
+    <a href="insertion.html">開始學習 →</a>
+  </div>
+
+  <!-- Selection Sort -->
+  <div class="card">
+    <div>
+      <span class="badge">選擇導向</span>
+      <h2>選擇排序</h2>
+      <div class="en">Selection Sort</div>
+      <p>
+        每一輪從未排序區域  
+        找出最小值，  
+        與第一個元素交換。
+      </p>
+    </div>
+    <a href="selection.html">開始學習 →</a>
+  </div>
+
 </div>
 
-<!-- 控制 -->
-<div class="controls">
-  <button onclick="nextStep()">單步</button>
-  <button onclick="reset()">重置</button>
-</div>
-
-<p class="info" id="info">請選擇排序演算法</p>
-
-<div class="chart">
-  <div class="bars" id="bars"></div>
+<div class="footer">
+  © 排序演算法視覺化｜課程 / 作業 / 專題展示
 </div>
 
 </div>
-
-<script>
-let algo='bubble';
-let arr=[60,30,90,20,80,40];
-let step=0;
-
-function setAlgo(a){
-  algo=a; step=0;
-  document.querySelectorAll('.selector button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('btn'+a.charAt(0).toUpperCase()+a.slice(1)).classList.add('active');
-  draw();
-}
-
-function draw(){
-  bars.innerHTML='';
-  const max=Math.max(...arr);
-  arr.forEach(v=>{
-    const col=document.createElement('div');
-    const bar=document.createElement('div');
-    bar.className='bar';
-    bar.style.height=(v/max*220)+'px';
-    const lbl=document.createElement('div');
-    lbl.className='bar-label';
-    lbl.textContent=v;
-    col.appendChild(bar);
-    col.appendChild(lbl);
-    bars.appendChild(col);
-  });
-  info.textContent=`目前演算法：${algo}`;
-}
-
-function nextStep(){
-  if(algo==='bubble' && step<arr.length-1){
-    if(arr[step]>arr[step+1]){
-      [arr[step],arr[step+1]]=[arr[step+1],arr[step]];
-    }
-    step++;
-  }
-  draw();
-}
-
-function reset(){
-  arr=[60,30,90,20,80,40];
-  step=0;
-  draw();
-}
-
-draw();
-</script>
-
 </body>
 </html>
