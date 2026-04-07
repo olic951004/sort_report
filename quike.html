@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>快速排序（Quick Sort）</title>
+
+<style>
+:root{
+  --primary:#2563eb;
+  --accent:#f59e0b;
+  --danger:#ef4444;
+  --success:#22c55e;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --border:#e5e7eb;
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:24px;
+  font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
+  background:var(--bg);
+  color:#0f172a;
+}
+
+/* 導覽 */
+.nav a{
+  display:inline-block;
+  margin-bottom:16px;
+  padding:8px 16px;
+  background:var(--primary);
+  color:#fff;
+  text-decoration:none;
+  border-radius:9999px;
+  font-size:14px;
+}
+
+/* 主卡片 */
+.container{
+  max-width:900px;
+  margin:auto;
+  background:var(--card);
+  padding:24px;
+  border-radius:16px;
+  box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+
+h1{margin-bottom:6px}
+.subtitle{color:#475569;margin-bottom:16px}
+
+/* 原理 */
+.principle{
+  background:#f1f5f9;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  font-size:14px;
+  margin-bottom:16px;
+}
+
+/* 控制 */
+.controls{
+  display:flex;
+  gap:10px;
+  margin-bottom:16px;
+}
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:9999px;
+  background:var(--primary);
+  color:#fff;
+  cursor:pointer;
+}
+button.secondary{background:#64748b}
+
+/* 圖表 */
+#bars{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  height:260px;
+  padding:16px;
+  background:#f8fafc;
+  border-radius:12px;
+}
+.bar{
+  width:36px;
+  background:var(--primary);
+  color:#fff;
+  text-align:center;
+  border-radius:6px 6px 0 0;
+  transition:.3s;
+}
+.bar.pivot{background:var(--accent)}
+.bar.active{background:var(--danger)}
+.bar.sorted{background:var(--success)}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+  <a href="index.html">← 回首頁</a>
+</div>
+
+<div class="container">
+  <h1>快速排序（Quick Sort）</h1>
+  <p class="subtitle">Divide and Conquer</p>
+
+  <div class="principle">
+    快速排序是一種<strong>分治演算法</strong>：
+    <br>1️⃣ 選擇一個基準值（Pivot）  
+    <br>2️⃣ 小於 Pivot 的放左邊，大於的放右邊  
+    <br>3️⃣ 對左右子陣列重複執行  
+    <br><br>
+    ✅ 平均時間複雜度：O(n log n)
+  </div>
+
+  <div class="controls">
+    <button onclick="start()">開始排序</button>
+    <button class="secondary" onclick="reset()">重置</button>
+  </div>
+
+  <div id="bars"></div>
+</div>
+
+<script>
+let original = [60, 30, 90, 20, 80, 40];
+let arr = [];
+let steps = [];
+let idx = 0;
+
+/* 快速排序步驟產生 */
+function quickSort(a, l, r){
+  if(l >= r) return;
+  let pivot = a[r];
+  let i = l;
+
+  for(let j = l; j < r; j++){
+    steps.push({arr:[...a], pivot:r, active:j});
+    if(a[j] < pivot){
+      [a[i], a[j]] = [a[j], a[i]];
+      steps.push({arr:[...a], pivot:r, active:i});
+      i++;
+    }
+  }
+  [a[i], a[r]] = [a[r], a[i]];
+  steps.push({arr:[...a], sorted:i});
+
+  quickSort(a, l, i-1);
+  quickSort(a, i+1, r);
+}
+
+/* 渲染 */
+function render(step){
+  bars.innerHTML='';
+  const max = Math.max(...step.arr);
+  step.arr.forEach((v,i)=>{
+    const bar=document.createElement('div');
+    bar.className='bar';
+    if(i===step.pivot) bar.classList.add('pivot');
+    if(i===step.active) bar.classList.add('active');
+    if(i===step.sorted) bar.classList.add('sorted');
+    bar.style.height=(v/max*220)+'px';
+    bar.textContent=v;
+    bars.appendChild(bar);
+  });
+}
+
+/* 播放 */
+function play(){
+  if(idx>=steps.length){
+    document.querySelectorAll('.bar').forEach(b=>b.classList.add('sorted'));
+    return;
+  }
+  render(steps[idx++]);
+  setTimeout(play,600);
+}
+
+function start(){
+  arr=[...original];
+  steps=[];
+  idx=0;
+  quickSort(arr,0,arr.length-1);
+  play();
+}
+
+function reset(){
+  arr=[...original];
+  steps=[];
+  idx=0;
+  render({arr});
+}
+
+/* 初始化 */
+reset();
+</script>
+
+</body>
+</html>
+``
