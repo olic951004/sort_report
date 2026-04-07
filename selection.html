@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>選擇排序（Selection Sort）</title>
-<nav class="nav-links">
-  <a href="index.html">← 回首頁</a>
-</nav>
+
 <style>
 :root{
   --primary:#2563eb;
@@ -27,6 +25,18 @@ body{
   color:#0f172a;
 }
 
+.nav-links{
+  margin-bottom:16px;
+}
+.nav-links a{
+  text-decoration:none;
+  background:#2563eb;
+  color:#fff;
+  padding:8px 16px;
+  border-radius:9999px;
+  font-size:14px;
+}
+
 .container{
   max-width:900px;
   margin:auto;
@@ -36,29 +46,72 @@ body{
   box-shadow:0 20px 40px rgba(0,0,0,.08);
 }
 
-h1{margin-bottom:6px}
-.subtitle{color:#475569;margin-bottom:16px}
-
-/* 原理說明 */
 .principle{
   background:#f1f5f9;
   border:1px solid var(--border);
   border-radius:12px;
   padding:16px 20px;
-  margin-bottom:20px;
-  font-size:14px;
-  line-height:1.7;
-}
-.principle strong{color:var(--accent)}
-
-/* 資訊列 */
-.info-bar{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
   margin-bottom:16px;
+  font-size:14px;
 }
-.info-pill{
+
+#bars{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  height:240px;
   background:#f8fafc;
-  border:1px solid var(--border);
-  border-radius:9999px;
+  border-radius:12px;
+  padding:16px;
+}
+
+.bar{
+  width:40px;
+  background:var(--primary);
+  border-radius:6px 6px 0 0;
+  color:#fff;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav-links">
+  <a href="index.html">← 回首頁</a>
+</nav>
+
+<div class="container">
+  <h1>選擇排序（Selection Sort）</h1>
+
+  <div class="principle">
+    選擇排序每一輪會從尚未排序的區域中找出最小值，
+    再與該區域的第一個元素交換位置。
+  </div>
+
+  <div id="bars"></div>
+</div>
+
+<script>
+/* ===== 測試資料 ===== */
+const arr = [60, 30, 90, 20, 80, 40];
+const bars = document.getElementById('bars');
+const max = Math.max(...arr);
+
+function render(){
+  bars.innerHTML = '';
+  arr.forEach(v=>{
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = (v / max * 200) + 'px';
+    bar.textContent = v;
+    bars.appendChild(bar);
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
+``
