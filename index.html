@@ -9,7 +9,6 @@
 :root{
   --primary:#2563eb;
   --accent:#f59e0b;
-  --success:#22c55e;
   --bg:#f8fafc;
   --card:#ffffff;
   --border:#e5e7eb;
@@ -18,47 +17,73 @@
 
 body{
   margin:0;
-  padding:32px 20px;
   font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
   background:var(--bg);
   color:#0f172a;
 }
 
+/* ===== 導覽列 ===== */
+.navbar{
+  background:#ffffff;
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:1000px;
+  margin:auto;
+  padding:14px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.nav-title{
+  font-weight:700;
+  font-size:18px;
+}
+.nav-links{
+  display:flex;
+  gap:14px;
+}
+.nav-links a{
+  text-decoration:none;
+  color:#2563eb;
+  font-size:14px;
+  padding:6px 14px;
+  border-radius:9999px;
+  transition:.2s;
+}
+.nav-links a:hover{
+  background:#eff6ff;
+}
+
+/* ===== 主內容 ===== */
 .container{
   max-width:1000px;
   margin:auto;
+  padding:32px 20px;
+}
+h1{margin-bottom:6px}
+.subtitle{
+  color:#475569;
+  margin-bottom:28px;
 }
 
-h1{margin-bottom:6px}
-.subtitle{color:#475569;margin-bottom:28px}
-
-/* 卡片區 */
-.grid{
+/* 卡片 */
+.cards{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:24px;
 }
-
 .card{
   background:var(--card);
   border:1px solid var(--border);
   border-radius:16px;
-  padding:22px 22px 26px;
+  padding:22px;
   box-shadow:0 10px 25px rgba(0,0,0,.06);
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-  transition:.25s;
 }
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 18px 40px rgba(0,0,0,.12);
-}
-
-.card h2{
-  margin:6px 0;
-  font-size:1.2rem;
-}
+.card h2{margin:6px 0}
 .card .en{
   color:#64748b;
   font-size:.9rem;
@@ -69,39 +94,22 @@ h1{margin-bottom:6px}
   line-height:1.6;
   color:#334155;
 }
-
-/* 標籤 */
-.badge{
-  display:inline-block;
-  background:#eff6ff;
-  color:var(--primary);
-  border:1px solid #bfdbfe;
-  border-radius:9999px;
-  padding:4px 12px;
-  font-size:12px;
-  margin-bottom:10px;
-  width:max-content;
-}
-
-/* 連結按鈕 */
 .card a{
   margin-top:18px;
   align-self:flex-start;
   text-decoration:none;
-  background:var(--primary);
+  background:#2563eb;
   color:#fff;
   padding:8px 18px;
   border-radius:9999px;
   font-size:14px;
-  transition:.2s;
 }
-.card a:hover{
-  background:#1d4ed8;
-}
+.card a:hover{background:#1d4ed8}
 
 /* Footer */
 .footer{
   margin-top:40px;
+  padding:20px;
   text-align:center;
   font-size:13px;
   color:#64748b;
@@ -110,47 +118,51 @@ h1{margin-bottom:6px}
 </head>
 
 <body>
-<div class="container">
 
-<h1>排序演算法視覺化</h1>
-<p class="subtitle">Sorting Algorithm Visualization</p>
+<!-- 導覽列 -->
+<header class="navbar">
+  <div class="nav-inner">
+    <div class="nav-title">排序演算法視覺化</div>
+    <nav class="nav-links">
+      <a href="index.html">首頁</a>
+      <a href="bubble.html">氣泡排序</a>
+      <a href="insertion.html">插入排序</a>
+      <a href="selection.html">選擇排序</a>
+    </nav>
+  </div>
+</header>
 
-<div class="grid">
+<!-- 首頁內容 -->
+<main class="container">
+  <h1>Sorting Algorithm Visualization</h1>
+  <p class="subtitle">
+    本網站透過動畫與互動介面，協助理解常見排序演算法的核心概念。
+  </p>
 
-  <!-- Bubble Sort -->
-  <div class="card">
-    <div>
-      <span class="badge">交換導向</span>
+  <div class="cards">
+    <div class="card">
       <h2>氣泡排序</h2>
       <div class="en">Bubble Sort</div>
       <p>
-        重複比較相鄰元素，  
+        反覆比較相鄰元素，  
         若順序錯誤就交換，  
-        讓最大值逐步移至右側。
+        讓最大值逐步移動至右側。
       </p>
+      <a href="bubble.html">開始學習 →</a>
     </div>
-    <a href="bubble.html">開始學習 →</a>
-  </div>
 
-  <!-- Insertion Sort -->
-  <div class="card">
-    <div>
-      <span class="badge">插入導向</span>
+    <div class="card">
       <h2>插入排序</h2>
       <div class="en">Insertion Sort</div>
       <p>
-        將每個元素插入到  
-        左側已排序區域的  
-        正確位置。
+        每次取一個新元素，  
+        插入到左側已排序  
+        區域的正確位置。
       </p>
+      <a href="insertion.html">開始學習 →</a>
     </div>
-    <a href="insertion.html">開始學習 →</a>
-  </div>
 
-  <!-- Selection Sort -->
-  <div class="card">
-    <div>
-      <span class="badge">選擇導向</span>
+    <div class="card">
       <h2>選擇排序</h2>
       <div class="en">Selection Sort</div>
       <p>
@@ -158,16 +170,14 @@ h1{margin-bottom:6px}
         找出最小值，  
         與第一個元素交換。
       </p>
+      <a href="selection.html">開始學習 →</a>
     </div>
-    <a href="selection.html">開始學習 →</a>
   </div>
+</main>
 
-</div>
+<footer class="footer">
+  © 排序演算法視覺化 ｜ 作業 / 課堂 / 專題展示
+</footer>
 
-<div class="footer">
-  © 排序演算法視覺化｜課程 / 作業 / 專題展示
-</div>
-
-</div>
 </body>
 </html>
