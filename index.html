@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>排序演算法視覺化</title>
 
 <style>
 :root{
   --primary:#2563eb;
   --accent:#f59e0b;
+  --danger:#ef4444;
   --success:#22c55e;
   --bg:#f8fafc;
   --card:#ffffff;
@@ -18,7 +19,7 @@
 
 body{
   margin:0;
-  padding:32px 20px;
+  padding:24px;
   font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
   background:var(--bg);
   color:#0f172a;
@@ -27,90 +28,98 @@ body{
 .container{
   max-width:1000px;
   margin:auto;
-}
-
-h1{
-  margin-bottom:8px;
-}
-.subtitle{
-  color:#475569;
-  margin-bottom:28px;
-}
-
-/* 卡片區 */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
-  gap:24px;
-}
-
-.card{
   background:var(--card);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:22px 22px 26px;
-  box-shadow:0 10px 25px rgba(0,0,0,.06);
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+
+h1{margin-bottom:6px}
+.subtitle{color:#475569;margin-bottom:16px}
+
+/* 排序選擇 */
+.selector{
   display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  transition:.25s;
+  gap:10px;
+  margin-bottom:16px;
+  flex-wrap:wrap;
 }
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 18px 40px rgba(0,0,0,.12);
-}
-
-/* 卡片內容 */
-.card h2{
-  font-size:1.2rem;
-  margin-bottom:6px;
-}
-.card .en{
-  color:#64748b;
-  font-size:.9rem;
-  margin-bottom:10px;
-}
-.card p{
-  font-size:14px;
-  line-height:1.6;
-  color:#334155;
-}
-
-/* 標籤 */
-.badge{
-  display:inline-block;
-  background:#eff6ff;
-  color:var(--primary);
-  border:1px solid #bfdbfe;
-  border-radius:9999px;
-  padding:4px 12px;
-  font-size:12px;
-  margin-bottom:12px;
-  width:max-content;
-}
-
-/* 按鈕 */
-.card a{
-  margin-top:18px;
-  align-self:flex-start;
-  text-decoration:none;
-  background:var(--primary);
-  color:#fff;
+.selector button{
   padding:8px 18px;
   border-radius:9999px;
-  font-size:14px;
-  transition:.2s;
+  border:1px solid var(--border);
+  background:#f1f5f9;
+  cursor:pointer;
 }
-.card a:hover{
-  background:#1d4ed8;
+.selector button.active{
+  background:var(--primary);
+  color:#fff;
 }
 
-/* footer */
-.footer{
-  margin-top:40px;
-  text-align:center;
+/* 控制 */
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.controls button{
+  padding:8px 16px;
+  border:none;
+  border-radius:9999px;
+  background:var(--primary);
+  color:#fff;
+}
+.controls button.secondary{background:#64748b}
+.controls button.warn{background:var(--accent)}
+.controls button:disabled{opacity:.5}
+
+/* 資訊列 */
+.info-bar{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.info-pill{
+  padding:6px 14px;
+  border-radius:9999px;
+  border:1px solid var(--border);
+  background:#f8fafc;
   font-size:13px;
-  color:#64748b;
+}
+.info-pill span{font-weight:700}
+
+/* 圖表 */
+.chart-wrap{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  background:#f8fafc;
+}
+.bars{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  align-items:flex-end;
+  height:260px;
+}
+.bar-col{
+  width:38px;
+  text-align:center;
+}
+.bar{
+  background:var(--primary);
+  border-radius:6px 6px 0 0;
+  transition:.25s;
+}
+.bar.compare{background:var(--accent)}
+.bar.swap{background:var(--danger)}
+.bar.sorted{background:var(--success)}
+.bar-label{
+  margin-top:6px;
+  font-size:12px;
+  color:#475569;
 }
 </style>
 </head>
@@ -119,19 +128,165 @@ h1{
 <div class="container">
 
 <h1>排序演算法視覺化</h1>
-<p class="subtitle">Sorting Algorithm Visualization</p>
+<p class="subtitle">Bubble / Insertion / Selection Sort</p>
 
-<div class="grid">
+<!-- 排序選擇 -->
+<div class="selector">
+  <button onclick="setAlgo('bubble')" class="active">氣泡排序</button>
+  <button onclick="setAlgo('insertion')">插入排序</button>
+  <button onclick="setAlgo('selection')">選擇排序</button>
+</div>
 
-  <!-- Bubble Sort -->
-  <div class="card">
-    <div>
-      <span class="badge">交換導向</span>
-      <h2>氣泡排序</h2>
-      <div class="en">Bubble Sort</div>
-      <p>
-        重複比較相鄰元素，  
-        若順序錯誤就交換，  
-        讓最大值逐步移動至右側。
-      </p>
-    </div>
+<!-- 控制 -->
+<div class="controls">
+  <button onclick="startAuto()">▶ 開始</button>
+  <button onclick="pauseAuto()" class="secondary">⏸ 暫停</button>
+  <button onclick="doStep()" class="warn">單步</button>
+  <button onclick="resetSort()" class="secondary">重置</button>
+  <button onclick="randomArray()" class="secondary">亂數</button>
+</div>
+
+<!-- 資訊 -->
+<div class="info-bar">
+  <div class="info-pill">比較：<span id="infoCmp">0</span></div>
+  <div class="info-pill">交換/移動：<span id="infoSwp">0</span></div>
+  <div class="info-pill">狀態：<span id="infoState">就緒</span></div>
+</div>
+
+<div class="chart-wrap">
+  <div class="bars" id="bars"></div>
+</div>
+
+</div>
+
+<script>
+/* ===== 全域狀態 ===== */
+let algo='bubble';
+let arr=[64,34,25,12,22,11,90];
+let steps=[],stepIdx=0,timer=null,delay=700;
+
+/* ===== 切換排序 ===== */
+function setAlgo(a){
+  algo=a;
+  document.querySelectorAll('.selector button')
+    .forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  resetSort();
+}
+
+/* ===== 產生步驟 ===== */
+function genSteps(){
+  if(algo==='bubble') return bubbleSteps();
+  if(algo==='insertion') return insertionSteps();
+  if(algo==='selection') return selectionSteps();
+}
+
+/* ===== Bubble ===== */
+function bubbleSteps(){
+  const s=[],d=[...arr];
+  let c=0,sw=0;
+  for(let i=0;i<d.length-1;i++){
+    for(let j=0;j<d.length-i-1;j++){
+      c++;
+      s.push({arr:[...d],j,c,sw,phase:'compare'});
+      if(d[j]>d[j+1]){
+        [d[j],d[j+1]]=[d[j+1],d[j]];
+        sw++;
+        s.push({arr:[...d],j,c,sw,phase:'swap'});
+      }
+    }
+  }
+  s.push({arr:[...d],c,sw,done:true});
+  return s;
+}
+
+/* ===== Insertion ===== */
+function insertionSteps(){
+  const s=[],d=[...arr];
+  let c=0,sw=0;
+  for(let i=1;i<d.length;i++){
+    let key=d[i],j=i-1;
+    while(j>=0){
+      c++;
+      if(d[j]>key){
+        d[j+1]=d[j]; j--; sw++;
+        s.push({arr:[...d],c,sw,phase:'swap'});
+      }else break;
+    }
+    d[j+1]=key;
+  }
+  s.push({arr:[...d],c,sw,done:true});
+  return s;
+}
+
+/* ===== Selection ===== */
+function selectionSteps(){
+  const s=[],d=[...arr];
+  let c=0,sw=0;
+  for(let i=0;i<d.length-1;i++){
+    let min=i;
+    for(let j=i+1;j<d.length;j++){
+      c++;
+      if(d[j]<d[min]) min=j;
+      s.push({arr:[...d],j,c,sw,phase:'compare'});
+    }
+    if(min!==i){
+      [d[i],d[min]]=[d[min],d[i]];
+      sw++;
+      s.push({arr:[...d],i,c,sw,phase:'swap'});
+    }
+  }
+  s.push({arr:[...d],c,sw,done:true});
+  return s;
+}
+
+/* ===== 渲染 ===== */
+function render(st){
+  bars.innerHTML='';
+  const max=Math.max(...st.arr);
+  st.arr.forEach((v,i)=>{
+    const c=document.createElement('div');
+    c.className='bar-col';
+    const b=document.createElement('div');
+    b.className='bar';
+    b.style.height=Math.max(20,v/max*220)+'px';
+    if(st.phase==='compare'&&i===st.j)b.classList.add('compare');
+    if(st.phase==='swap')b.classList.add('swap');
+    if(st.done)b.classList.add('sorted');
+    c.appendChild(b);
+    const l=document.createElement('div');
+    l.className='bar-label'; l.textContent=v;
+    c.appendChild(l);
+    bars.appendChild(c);
+  });
+  infoCmp.textContent=st.c||0;
+  infoSwp.textContent=st.sw||0;
+  infoState.textContent=st.done?'完成 ✅':(timer?'播放中':'暫停');
+}
+
+/* ===== 控制 ===== */
+function doStep(){
+  if(stepIdx<steps.length-1){stepIdx++;render(steps[stepIdx]);}
+}
+function startAuto(){
+  if(timer)return;
+  timer=setInterval(()=>{
+    if(stepIdx>=steps.length-1){pauseAuto();return}
+    doStep();
+  },delay);
+}
+function pauseAuto(){clearInterval(timer);timer=null}
+function resetSort(){
+  pauseAuto();steps=genSteps();stepIdx=0;render(steps[0]);
+}
+function randomArray(){
+  arr=Array.from({length:7},()=>Math.floor(Math.random()*90)+10);
+  resetSort();
+}
+
+/* 啟動 */
+resetSort();
+</script>
+
+</body>
+</html>
