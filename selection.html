@@ -1,84 +1,194 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>選擇排序（Selection Sort）</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>選擇排序（Selection Sort）</title>
 
-  <style>
-    body{
-      font-family:"Microsoft JhengHei",system-ui,sans-serif;
-      background:#f8fafc;
-      padding:24px;
-    }
-    .nav-links a{
-      display:inline-block;
-      margin-bottom:16px;
-      padding:8px 16px;
-      background:#2563eb;
-      color:#fff;
-      text-decoration:none;
-      border-radius:9999px;
-    }
-    .container{
-      background:#fff;
-      border-radius:16px;
-      padding:24px;
-      box-shadow:0 20px 40px rgba(0,0,0,.08);
-      max-width:900px;
-      margin:auto;
-    }
-    #bars{
-      display:flex;
-      align-items:flex-end;
-      gap:8px;
-      height:240px;
-      margin-top:24px;
-    }
-    .bar{
-      width:40px;
-      background:#2563eb;
-      color:#fff;
-      text-align:center;
-      border-radius:6px 6px 0 0;
-    }
-  </style>
+<style>
+:root{
+  --primary:#2563eb;
+  --compare:#f59e0b;
+  --swap:#ef4444;
+  --sorted:#22c55e;
+  --bg:#f8fafc;
+}
+
+body{
+  font-family:"Microsoft JhengHei",system-ui,sans-serif;
+  background:var(--bg);
+  padding:24px;
+}
+
+.nav-links a{
+  display:inline-block;
+  margin-bottom:16px;
+  padding:8px 16px;
+  background:var(--primary);
+  color:#fff;
+  text-decoration:none;
+  border-radius:9999px;
+}
+
+.container{
+  background:#fff;
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 20px 40px rgba(0,0,0,.08);
+  max-width:900px;
+  margin:auto;
+}
+
+.controls{
+  margin:16px 0;
+  display:flex;
+  gap:10px;
+}
+
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:9999px;
+  background:var(--primary);
+  color:#fff;
+  cursor:pointer;
+}
+button.secondary{ background:#64748b; }
+
+#msg{
+  margin-top:10px;
+  font-size:14px;
+  color:#475569;
+}
+
+#bars{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  height:260px;
+  margin-top:24px;
+}
+
+.bar{
+  width:40px;
+  background:var(--primary);
+  color:#fff;
+  text-align:center;
+  border-radius:6px 6px 0 0;
+  transition:.3s;
+}
+.bar.compare{ background:var(--compare); }
+.bar.min{ background:var(--swap); }
+.bar.sorted{ background:var(--sorted); }
+</style>
 </head>
 
 <body>
 
-  <nav class="nav-links">
-    <a href="index.html">← 回首頁</a>
-  </nav>
+<nav class="nav-links">
+  <a href="index.html">← 回首頁</a>
+</nav>
 
-  <div class="container">
-    <h1>選擇排序（Selection Sort）</h1>
-    <p>
-      選擇排序每一輪會從尚未排序的區域中找出最小值，
-      再與該區域的第一個元素交換位置。
-    </p>
+<div class="container">
+  <h1>選擇排序（Selection Sort）</h1>
+  <p>
+    每一輪從未排序區域中找出最小值，
+    與該區域的第一個元素交換。
+  </p>
 
-    <div id="bars"></div>
+  <div class="controls">
+    <button onclick="start()">開始</button>
+    <button onclick="step()" class="secondary">單步</button>
+    <button onclick="reset()" class="secondary">重置</button>
   </div>
 
-  <script>
-    const arr = [60, 30, 90, 20, 80, 40];
-    const bars = document.getElementById('bars');
-    const max = Math.max(...arr);
+  <div id="msg">按「開始」或「單步」觀察排序過程</div>
 
-    function render(){
-      bars.innerHTML = '';
-      arr.forEach(v=>{
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = (v / max * 200) + 'px';
-        bar.textContent = v;
-        bars.appendChild(bar);
-      });
+  <div id="bars"></div>
+</div>
+
+<script>
+const original = [60, 30, 90, 20, 80, 40];
+let arr = [];
+let steps = [];
+let stepIndex = 0;
+
+function buildSteps(){
+  steps = [];
+  const a = [...original];
+  const n = a.length;
+
+  for(let i=0;i<n-1;i++){
+    let min = i;
+    for(let j=i+1;j<n;j++){
+      steps.push({arr:[...a], i, j, min, msg:`比較 ${a[j]} 與 ${a[min]}`});
+      if(a[j] < a[min]){
+        min = j;
+        steps.push({arr:[...a], i, min, msg:`更新最小值為 ${a[min]}`});
+      }
     }
+    if(min !== i){
+      [a[i], a[min]] = [a[min], a[i]];
+      steps.push({arr:[...a], sorted:i, msg:`交換並固定 ${a[i]}`});
+    } else {
+      steps.push({arr:[...a], sorted:i, msg:`${a[i]} 已在正確位置`});
+    }
+  }
+  steps.push({arr:[...a], done:true, msg:'🎉 排序完成'});
+}
 
-    render();
-  </script>
+function render(state){
+  const bars = document.getElementById('bars');
+  bars.innerHTML='';
+  const max = Math.max(...state.arr);
+
+  state.arr.forEach((v,idx)=>{
+    const bar = document.createElement('div');
+    bar.className='bar';
+    bar.style.height=(v/max*220)+'px';
+    bar.textContent=v;
+
+    if(state.sorted !== undefined && idx <= state.sorted){
+      bar.classList.add('sorted');
+    }
+    if(idx === state.j) bar.classList.add('compare');
+    if(idx === state.min) bar.classList.add('min');
+
+    bars.appendChild(bar);
+  });
+
+  document.getElementById('msg').textContent = state.msg || '';
+}
+
+function step(){
+  if(stepIndex >= steps.length) return;
+  render(steps[stepIndex++]);
+}
+
+let timer=null;
+function start(){
+  if(timer) return;
+  timer = setInterval(()=>{
+    if(stepIndex >= steps.length){
+      clearInterval(timer);
+      timer=null;
+      return;
+    }
+    step();
+  },600);
+}
+
+function reset(){
+  clearInterval(timer);
+  timer=null;
+  arr=[...original];
+  stepIndex=0;
+  buildSteps();
+  render({arr, msg:'已重置'});
+}
+
+reset();
+</script>
 
 </body>
 </html>
