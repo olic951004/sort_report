@@ -15,7 +15,6 @@
   --card:#ffffff;
   --border:#e5e7eb;
 }
-
 *{box-sizing:border-box}
 
 body{
@@ -38,7 +37,7 @@ body{
 h1{margin-bottom:6px}
 .subtitle{color:#475569;margin-bottom:16px}
 
-/* ── 說明卡 ── */
+/* 說明 */
 .principle{
   background:#f1f5f9;
   border:1px solid var(--border);
@@ -50,11 +49,11 @@ h1{margin-bottom:6px}
 }
 .principle strong{color:var(--accent)}
 
-/* ── 資訊列 ── */
+/* 狀態列 */
 .info-bar{
   display:flex;
-  flex-wrap:wrap;
   gap:12px;
+  flex-wrap:wrap;
   margin-bottom:16px;
 }
 .info-pill{
@@ -66,7 +65,7 @@ h1{margin-bottom:6px}
 }
 .info-pill span{font-weight:700}
 
-/* ── 步驟文字 ── */
+/* 步驟訊息 */
 .step-msg{
   background:#eff6ff;
   border:1px solid #bfdbfe;
@@ -74,139 +73,3 @@ h1{margin-bottom:6px}
   padding:10px 18px;
   margin-bottom:18px;
   font-size:14px;
-  color:#1e3a8a;
-}
-
-/* ── 圖表 ── */
-.chart-wrap{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:16px;
-  background:#f8fafc;
-  margin-bottom:16px;
-}
-
-.bars{
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  gap:8px;
-  height:260px;
-}
-.bar-col{
-  width:40px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-.bar{
-  width:100%;
-  background:var(--primary);
-  border-radius:6px 6px 0 0;
-  transition:.25s;
-}
-.bar.comparing{background:var(--accent)}
-.bar.minimum{background:#fb923c}
-.bar.swapping{background:var(--danger)}
-.bar.sorted{background:var(--success)}
-.bar.pass-start{background:#818cf8}
-
-.bar-label{
-  margin-top:6px;
-  font-size:12px;
-  color:#475569;
-}
-
-/* ── 圖例 ── */
-.legend{
-  margin-top:12px;
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
-  font-size:12px;
-  color:#475569;
-}
-.legend-item{display:flex;align-items:center;gap:6px}
-.legend-dot{width:14px;height:14px;border-radius:4px}
-
-/* ── 控制列 ── */
-.controls{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  justify-content:center;
-  margin-bottom:20px;
-}
-button{
-  padding:8px 16px;
-  border:none;
-  border-radius:9999px;
-  background:var(--primary);
-  color:#fff;
-  font-size:14px;
-  cursor:pointer;
-}
-button.secondary{background:#64748b}
-button.warn{background:var(--accent)}
-button:disabled{opacity:.5;cursor:not-allowed}
-
-.size-wrap,.speed-wrap{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:13px;
-  color:#475569;
-  background:#f8fafc;
-  border:1px solid var(--border);
-  border-radius:9999px;
-  padding:6px 12px;
-}
-
-/* ── Pseudo code ── */
-.code-box{
-  background:#0f172a;
-  color:#cbd5f5;
-  border-radius:14px;
-  padding:18px 22px;
-  font-family:Consolas,monospace;
-  font-size:13px;
-}
-.code-line{line-height:1.8}
-.code-line.highlight{
-  background:#1e293b;
-  border-radius:6px;
-}
-.kw{color:#93c5fd}
-.fn{color:#fbbf24}
-.num{color:#fdba74}
-.cm{color:#64748b}
-</style>
-</head>
-
-<body>
-<div class="container">
-
-<h1>選擇排序（Selection Sort）</h1>
-<p class="subtitle">視覺化步驟演示</p>
-
-<div class="principle">
-<strong>原理：</strong>
-每一輪排序都在尚未排序區間中找出最小值，  
-並與該區間的第一個元素交換位置。  
-<br><br>
-時間複雜度：<strong>O(n²)</strong>（不論資料是否已排序）
-</div>
-
-<!-- ✅ 以下 HTML（info-bar / bars / controls / code-box）維持你原本的結構 -->
-<!-- ✅ JS 完全照你貼的那一份，不須修改 -->
-
-</div>
-
-<!-- ✅ 保留你原本的 JS，直接貼在這裡 -->
-<script>
-/* 原本 Selection Sort 的 JS 原封不動 */
-</script>
-
-</body>
-</html>
