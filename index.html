@@ -20,7 +20,7 @@
 body{
   margin:0;
   padding:24px;
-  font-family:system-ui,-apple-system,"Microsoft JhengHei",Segoe UI,Arial;
+  font-family:system-ui,"Microsoft JhengHei",Segoe UI,Arial;
   background:var(--bg);
   color:#0f172a;
 }
@@ -35,14 +35,12 @@ body{
 }
 
 h1{margin-bottom:6px}
-.subtitle{color:#475569;margin-bottom:16px}
+.subtitle{color:#475569;margin-bottom:20px}
 
-/* 排序選擇 */
 .selector{
   display:flex;
   gap:10px;
-  margin-bottom:16px;
-  flex-wrap:wrap;
+  margin-bottom:20px;
 }
 .selector button{
   padding:8px 18px;
@@ -56,7 +54,6 @@ h1{margin-bottom:6px}
   color:#fff;
 }
 
-/* 控制 */
 .controls{
   display:flex;
   gap:10px;
@@ -72,26 +69,14 @@ h1{margin-bottom:6px}
 }
 .controls button.secondary{background:#64748b}
 .controls button.warn{background:var(--accent)}
-.controls button:disabled{opacity:.5}
 
-/* 資訊列 */
-.info-bar{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
+.info{
   margin-bottom:14px;
+  font-size:14px;
+  color:#475569;
 }
-.info-pill{
-  padding:6px 14px;
-  border-radius:9999px;
-  border:1px solid var(--border);
-  background:#f8fafc;
-  font-size:13px;
-}
-.info-pill span{font-weight:700}
 
-/* 圖表 */
-.chart-wrap{
+.chart{
   border:1px solid var(--border);
   border-radius:14px;
   padding:16px;
@@ -100,25 +85,20 @@ h1{margin-bottom:6px}
 .bars{
   display:flex;
   gap:8px;
-  justify-content:center;
-  align-items:flex-end;
   height:260px;
-}
-.bar-col{
-  width:38px;
-  text-align:center;
+  align-items:flex-end;
+  justify-content:center;
 }
 .bar{
+  width:40px;
   background:var(--primary);
   border-radius:6px 6px 0 0;
   transition:.25s;
 }
-.bar.compare{background:var(--accent)}
-.bar.swap{background:var(--danger)}
-.bar.sorted{background:var(--success)}
 .bar-label{
-  margin-top:6px;
+  text-align:center;
   font-size:12px;
+  margin-top:6px;
   color:#475569;
 }
 </style>
@@ -128,164 +108,76 @@ h1{margin-bottom:6px}
 <div class="container">
 
 <h1>排序演算法視覺化</h1>
-<p class="subtitle">Bubble / Insertion / Selection Sort</p>
+<p class="subtitle">Sorting Algorithm Visualization</p>
 
-<!-- 排序選擇 -->
+<!-- 演算法切換 -->
 <div class="selector">
-  <button onclick="setAlgo('bubble')" class="active">氣泡排序</button>
-  <button onclick="setAlgo('insertion')">插入排序</button>
-  <button onclick="setAlgo('selection')">選擇排序</button>
+  <button id="btnBubble" class="active" onclick="setAlgo('bubble')">氣泡排序</button>
+  <button id="btnInsertion" onclick="setAlgo('insertion')">插入排序</button>
+  <button id="btnSelection" onclick="setAlgo('selection')">選擇排序</button>
 </div>
 
 <!-- 控制 -->
 <div class="controls">
-  <button onclick="startAuto()">▶ 開始</button>
-  <button onclick="pauseAuto()" class="secondary">⏸ 暫停</button>
-  <button onclick="doStep()" class="warn">單步</button>
-  <button onclick="resetSort()" class="secondary">重置</button>
-  <button onclick="randomArray()" class="secondary">亂數</button>
+  <button onclick="nextStep()">單步</button>
+  <button onclick="reset()">重置</button>
 </div>
 
-<!-- 資訊 -->
-<div class="info-bar">
-  <div class="info-pill">比較：<span id="infoCmp">0</span></div>
-  <div class="info-pill">交換/移動：<span id="infoSwp">0</span></div>
-  <div class="info-pill">狀態：<span id="infoState">就緒</span></div>
-</div>
+<p class="info" id="info">請選擇排序演算法</p>
 
-<div class="chart-wrap">
+<div class="chart">
   <div class="bars" id="bars"></div>
 </div>
 
 </div>
 
 <script>
-/* ===== 全域狀態 ===== */
 let algo='bubble';
-let arr=[64,34,25,12,22,11,90];
-let steps=[],stepIdx=0,timer=null,delay=700;
+let arr=[60,30,90,20,80,40];
+let step=0;
 
-/* ===== 切換排序 ===== */
 function setAlgo(a){
-  algo=a;
-  document.querySelectorAll('.selector button')
-    .forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
-  resetSort();
+  algo=a; step=0;
+  document.querySelectorAll('.selector button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn'+a.charAt(0).toUpperCase()+a.slice(1)).classList.add('active');
+  draw();
 }
 
-/* ===== 產生步驟 ===== */
-function genSteps(){
-  if(algo==='bubble') return bubbleSteps();
-  if(algo==='insertion') return insertionSteps();
-  if(algo==='selection') return selectionSteps();
-}
-
-/* ===== Bubble ===== */
-function bubbleSteps(){
-  const s=[],d=[...arr];
-  let c=0,sw=0;
-  for(let i=0;i<d.length-1;i++){
-    for(let j=0;j<d.length-i-1;j++){
-      c++;
-      s.push({arr:[...d],j,c,sw,phase:'compare'});
-      if(d[j]>d[j+1]){
-        [d[j],d[j+1]]=[d[j+1],d[j]];
-        sw++;
-        s.push({arr:[...d],j,c,sw,phase:'swap'});
-      }
-    }
-  }
-  s.push({arr:[...d],c,sw,done:true});
-  return s;
-}
-
-/* ===== Insertion ===== */
-function insertionSteps(){
-  const s=[],d=[...arr];
-  let c=0,sw=0;
-  for(let i=1;i<d.length;i++){
-    let key=d[i],j=i-1;
-    while(j>=0){
-      c++;
-      if(d[j]>key){
-        d[j+1]=d[j]; j--; sw++;
-        s.push({arr:[...d],c,sw,phase:'swap'});
-      }else break;
-    }
-    d[j+1]=key;
-  }
-  s.push({arr:[...d],c,sw,done:true});
-  return s;
-}
-
-/* ===== Selection ===== */
-function selectionSteps(){
-  const s=[],d=[...arr];
-  let c=0,sw=0;
-  for(let i=0;i<d.length-1;i++){
-    let min=i;
-    for(let j=i+1;j<d.length;j++){
-      c++;
-      if(d[j]<d[min]) min=j;
-      s.push({arr:[...d],j,c,sw,phase:'compare'});
-    }
-    if(min!==i){
-      [d[i],d[min]]=[d[min],d[i]];
-      sw++;
-      s.push({arr:[...d],i,c,sw,phase:'swap'});
-    }
-  }
-  s.push({arr:[...d],c,sw,done:true});
-  return s;
-}
-
-/* ===== 渲染 ===== */
-function render(st){
+function draw(){
   bars.innerHTML='';
-  const max=Math.max(...st.arr);
-  st.arr.forEach((v,i)=>{
-    const c=document.createElement('div');
-    c.className='bar-col';
-    const b=document.createElement('div');
-    b.className='bar';
-    b.style.height=Math.max(20,v/max*220)+'px';
-    if(st.phase==='compare'&&i===st.j)b.classList.add('compare');
-    if(st.phase==='swap')b.classList.add('swap');
-    if(st.done)b.classList.add('sorted');
-    c.appendChild(b);
-    const l=document.createElement('div');
-    l.className='bar-label'; l.textContent=v;
-    c.appendChild(l);
-    bars.appendChild(c);
+  const max=Math.max(...arr);
+  arr.forEach(v=>{
+    const col=document.createElement('div');
+    const bar=document.createElement('div');
+    bar.className='bar';
+    bar.style.height=(v/max*220)+'px';
+    const lbl=document.createElement('div');
+    lbl.className='bar-label';
+    lbl.textContent=v;
+    col.appendChild(bar);
+    col.appendChild(lbl);
+    bars.appendChild(col);
   });
-  infoCmp.textContent=st.c||0;
-  infoSwp.textContent=st.sw||0;
-  infoState.textContent=st.done?'完成 ✅':(timer?'播放中':'暫停');
+  info.textContent=`目前演算法：${algo}`;
 }
 
-/* ===== 控制 ===== */
-function doStep(){
-  if(stepIdx<steps.length-1){stepIdx++;render(steps[stepIdx]);}
-}
-function startAuto(){
-  if(timer)return;
-  timer=setInterval(()=>{
-    if(stepIdx>=steps.length-1){pauseAuto();return}
-    doStep();
-  },delay);
-}
-function pauseAuto(){clearInterval(timer);timer=null}
-function resetSort(){
-  pauseAuto();steps=genSteps();stepIdx=0;render(steps[0]);
-}
-function randomArray(){
-  arr=Array.from({length:7},()=>Math.floor(Math.random()*90)+10);
-  resetSort();
+function nextStep(){
+  if(algo==='bubble' && step<arr.length-1){
+    if(arr[step]>arr[step+1]){
+      [arr[step],arr[step+1]]=[arr[step+1],arr[step]];
+    }
+    step++;
+  }
+  draw();
 }
 
-/* 啟動 */
-resetSort();
+function reset(){
+  arr=[60,30,90,20,80,40];
+  step=0;
+  draw();
+}
+
+draw();
 </script>
 
 </body>
